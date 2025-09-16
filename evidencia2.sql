@@ -23,29 +23,45 @@ SET time_zone = "+00:00";
 
 DELIMITER $$
 --
--- Procedimientos
+-- Procedimientos para crear un docente nuevo
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_create` (IN `p_numero_documento` VARCHAR(20), IN `p_nombres` VARCHAR(120), IN `p_titulo` VARCHAR(120), IN `p_anios` INT, IN `p_direccion` VARCHAR(180), IN `p_tipo` VARCHAR(40), OUT `p_docente_id` INT)   BEGIN
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_create` (IN `p_numero_documento` VARCHAR(20),-- Documento del docente 
+  IN `p_nombres` VARCHAR(120),-- Nombre completo del docente
+  IN `p_titulo` VARCHAR(120),-- Titulo academico
+  IN `p_anios` INT,  -- Años de experiencia
+  IN `p_direccion` VARCHAR(180),-- Direccion del docente
+  IN `p_tipo` VARCHAR(40),-- Tipo de docente (Planta, catedra, etc.)
+  OUT `p_docente_id` INT) -- Variable de salida par obtener el ID insertado
+  BEGIN    -- Insertar un nuevo registro en la tabla  docentes
   INSERT INTO docente (numero_documento, nombres, titulo, anios_experiencia, direccion, tipo_docente)
   VALUES (p_numero_documento, p_nombres, p_titulo, p_anios, p_direccion, p_tipo);
-
+-- REtornar el ID generado automaticamente
   SET p_docente_id = LAST_INSERT_ID();
 END$$
-
+-- Procedimeinto para eliminar un docente por su ID
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_delete` (IN `p_docente_id` INT)   BEGIN
-  DELETE FROM docente WHERE docente_id = p_docente_id;
-  SELECT ROW_COUNT() AS filas_afectadas;
+  DELETE FROM docente WHERE docente_id = p_docente_id;-- Elimina el docente con el ID especifico
+  SELECT ROW_COUNT() AS filas_afectadas; -- Retorna cuantas filas fueron afectadas (1 si se elemino, 0 si no se encontro)
 END$$
-
+-- Procedimiento para consultar un docente especifico ID
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_read` (IN `p_docente_id` INT)   BEGIN
-  SELECT * FROM docente WHERE docente_id = p_docente_id;
+  SELECT * FROM docente WHERE docente_id = p_docente_id; -- ID docente a consultar
 END$$
-
+-- Retorna los datos del docente especifico
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_read_all` (IN `p_offset` INT, IN `p_limit` INT)   BEGIN
-  SELECT * FROM docente ORDER BY docente_id LIMIT p_limit OFFSET p_offset;
+-- Listar todos los docentes con paginacion
+  SELECT * FROM docente ORDER BY docente_id LIMIT p_limit OFFSET p_offset;  
 END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_update` (IN `p_docente_id` INT, IN `p_numero_documento` VARCHAR(20), IN `p_nombres` VARCHAR(120), IN `p_titulo` VARCHAR(120), IN `p_anios` INT, IN `p_direccion` VARCHAR(180), IN `p_tipo` VARCHAR(40))   BEGIN
+ -- Actualizar los datos de un docente
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_update` (IN `p_docente_id` INT, -- ID del docente a actualizar
+  IN `p_numero_documento` VARCHAR(20),-- Nuevo numero de documento
+  IN `p_nombres` VARCHAR(120),-- Nuevos nombres
+  IN `p_titulo` VARCHAR(120),-- Nuevo titulo
+  IN `p_anios` INT,-- Nuevos años de experiencia
+  IN `p_direccion` VARCHAR(180), -- Direccion nueva 
+  IN `p_tipo` VARCHAR(40))  -- Nuevo tipo de docente 
+  BEGIN
+  -- Actualizar docente con los nuevos  datos
   UPDATE docente
      SET numero_documento  = p_numero_documento,
          nombres           = p_nombres,
@@ -53,37 +69,45 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_update` (IN `p_docente_i
          anios_experiencia = p_anios,
          direccion         = p_direccion,
          tipo_docente      = p_tipo
-   WHERE docente_id = p_docente_id;
-
+   WHERE docente_id = p_docente_id;-- clausula para filtrar  datos
+-- Retorna cuantas filas fueron afectadas o si no cambia ninguna
   SELECT ROW_COUNT() AS filas_afectadas;
 END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_create` (IN `p_nombre` VARCHAR(120), IN `p_descripcion` VARCHAR(400), IN `p_fecha_inicial` DATE, IN `p_fecha_final` DATE, IN `p_presupuesto` DECIMAL(12,2), IN `p_horas` INT, IN `p_docente_jefe_id` INT, OUT `p_proyecto_id` INT)   BEGIN
+-- Procedimiento para crear un nuevo proyecto
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_create` (IN `p_nombre` VARCHAR(120),-- Nombre del proyecto
+  IN `p_descripcion` VARCHAR(400),-- Descripcion del proyecto
+  IN `p_fecha_inicial` DATE,-- fecha de inicio
+  IN `p_fecha_final` DATE,-- fecha de finalizacion 
+  IN `p_presupuesto` DECIMAL(12,2),-- presupuesto asignado
+  IN `p_horas` INT, -- Horas estimadas
+  IN `p_docente_jefe_id` INT,-- ID docente jefe
+  OUT `p_proyecto_id` INT)   -- ID del nuevo proyecto insertado
+  BEGIN                    -- Inserta un nuevo proyecto en la tabla 
   INSERT INTO proyecto (nombre, descripcion, fecha_inicial, fecha_final, presupuesto, horas, docente_id_jefe)
   VALUES (p_nombre, p_descripcion, p_fecha_inicial, p_fecha_final, p_presupuesto, p_horas, p_docente_jefe_id);
-
+-- Retorna el ID del proyecto insertado
   SET p_proyecto_id = LAST_INSERT_ID();
 END$$
-
+-- procedimiento para eliminar un proyecto por su ID
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_delete` (IN `p_proyecto_id` INT)   BEGIN
-  DELETE FROM proyecto WHERE proyecto_id = p_proyecto_id;
-  SELECT ROW_COUNT() AS filas_afectadas;
+  DELETE FROM proyecto WHERE proyecto_id = p_proyecto_id;-- Elimina el proyecto
+  SELECT ROW_COUNT() AS filas_afectadas;-- Retorna cuantas filas fueron afectadas
 END$$
-
+-- Procedimientos donde se consulta un proyecto por su ID
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_read` (IN `p_proyecto_id` INT)   BEGIN
-  SELECT * FROM proyecto WHERE proyecto_id = p_proyecto_id;
+  SELECT * FROM proyecto WHERE proyecto_id = p_proyecto_id; -- Retorna todos los datos del proyecto
 END$$
-
+-- Procedimiento para listar todos los proyectos con informacion del docente jefe
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_read_all` (IN `p_offset` INT, IN `p_limit` INT)   BEGIN
-  SELECT p.*, d.nombres AS jefe_nombre
+  SELECT p.*, d.nombres AS jefe_nombre  -- lista los proyectos junto con  el nombre del docente jefe, con paginacion
     FROM proyecto p
     JOIN docente  d ON d.docente_id = p.docente_id_jefe
    ORDER BY p.proyecto_id
    LIMIT p_limit OFFSET p_offset;
 END$$
-
+-- Procedimiento para actualizar los datos de un proyecto
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_update` (IN `p_proyecto_id` INT, IN `p_nombre` VARCHAR(120), IN `p_descripcion` VARCHAR(400), IN `p_fecha_inicial` DATE, IN `p_fecha_final` DATE, IN `p_presupuesto` DECIMAL(12,2), IN `p_horas` INT, IN `p_docente_jefe_id` INT)   BEGIN
-  UPDATE proyecto
+  UPDATE proyecto    -- Atualiza los datos del proyecto
      SET nombre          = p_nombre,
          descripcion     = p_descripcion,
          fecha_inicial   = p_fecha_inicial,
@@ -92,26 +116,25 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_proyecto_update` (IN `p_proyecto
          horas           = p_horas,
          docente_id_jefe = p_docente_jefe_id
    WHERE proyecto_id     = p_proyecto_id;
-
+-- Retorna cuantas filas se actualizaron
   SELECT ROW_COUNT() AS filas_afectadas;
 END$$
 
---
--- Funciones
---
+-- -- Funciones calcula el presupuesto  por hora de un proyecto especifico
+
 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_presupuesto_hora` (`p_proyecto_id` INT) RETURNS DECIMAL(12,2) DETERMINISTIC READS SQL DATA BEGIN
   DECLARE v_pres DECIMAL(12,2);
   DECLARE v_horas INT;
-
+-- obtiene el presuspuesto y las horas del proyecto
   SELECT presupuesto, horas
     INTO v_pres, v_horas
     FROM proyecto
    WHERE proyecto_id = p_proyecto_id;
-
+-- si no hay  datos o las horas son 0 retorna NULL para evitar dividir por 0
   IF v_pres IS NULL OR v_horas IS NULL OR v_horas = 0 THEN
     RETURN NULL;
   END IF;
-
+-- calcula y retorna
   RETURN ROUND(v_pres / v_horas, 2);
 END$$
 
@@ -158,7 +181,7 @@ CREATE TABLE `copia_eliminados_tabladd` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `docente`
+-- Estructura de tabla para la tabla `docente`  Esta tabla almacena los docentes de la institucion
 --
 
 CREATE TABLE `docente` (
@@ -229,14 +252,14 @@ INSERT INTO `docente` (`docente_id`, `numero_documento`, `nombres`, `titulo`, `a
 
 --
 -- Disparadores `docente`
---
+-- Tigger  que se ejecuten despues de eliminar un registro de la tabla docente 
 DELIMITER $$
 CREATE TRIGGER `trg_docente_after_delete` AFTER DELETE ON `docente` FOR EACH ROW BEGIN
-  INSERT INTO copia_eliminados_tablaDD(tabla, pk_valor, registro)
+  INSERT INTO copia_eliminados_tablaDD(tabla, pk_valor, registro)-- Inserta un registro en la tabla de auditoria para eliminar , con la informacion eliminada como JSON
   VALUES(
-    'docente',
-    CAST(OLD.docente_id AS CHAR),
-    JSON_OBJECT(
+    'docente', -- Nombre de la tabla
+    CAST(OLD.docente_id AS CHAR),-- Valor de la llave primaria eliminada
+    JSON_OBJECT( -- Registro eliminado convertido a JSON
       'docente_id', OLD.docente_id,
       'numero_documento', OLD.numero_documento,
       'nombres', OLD.nombres,
@@ -250,12 +273,13 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
+  -- Tigger que se ejecuta antes de actualizar un registro de la tabla docente
 CREATE TRIGGER `trg_docente_before_update` BEFORE UPDATE ON `docente` FOR EACH ROW BEGIN
-  INSERT INTO copia_actualizados_tablaUU(tabla, pk_valor, antes, despues)
+  INSERT INTO copia_actualizados_tablaUU(tabla, pk_valor, antes, despues) -- Insertar un registro en la tabla de auditoria para actualizaciones, con los datos anteriores y los nuevos con JSON
   VALUES(
-    'docente',
-    CAST(OLD.docente_id AS CHAR),
-    JSON_OBJECT(
+    'docente',-- Nombre de la tabla
+    CAST(OLD.docente_id AS CHAR),-- valor de la llave primaria
+    JSON_OBJECT( -- valores anteriores
       'docente_id', OLD.docente_id,
       'numero_documento', OLD.numero_documento,
       'nombres', OLD.nombres,
@@ -264,7 +288,7 @@ CREATE TRIGGER `trg_docente_before_update` BEFORE UPDATE ON `docente` FOR EACH R
       'direccion', OLD.direccion,
       'tipo_docente', OLD.tipo_docente
     ),
-    JSON_OBJECT(
+    JSON_OBJECT(-- Valores nuevos
       'docente_id', NEW.docente_id,
       'numero_documento', NEW.numero_documento,
       'nombres', NEW.nombres,
@@ -296,11 +320,11 @@ CREATE TABLE `proyecto` (
 ) ;
 
 --
--- Disparadores `proyecto`
---
+-- Disparadores proyecto
+--Tigger que se ejecutan despues de eliminar un proyecto
 DELIMITER $$
 CREATE TRIGGER `trg_proyecto_after_delete` AFTER DELETE ON `proyecto` FOR EACH ROW BEGIN
-  INSERT INTO copia_eliminados_tablaDD(tabla, pk_valor, registro)
+  INSERT INTO copia_eliminados_tablaDD(tabla, pk_valor, registro) -- Inserta en la tabla de auditoria los datos del proyecto eliminado
   VALUES(
     'proyecto',
     CAST(OLD.proyecto_id AS CHAR),
@@ -319,8 +343,9 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `trg_proyecto_before_update` BEFORE UPDATE ON `proyecto` FOR EACH ROW BEGIN
-  INSERT INTO copia_actualizados_tablaUU(tabla, pk_valor, antes, despues)
+CREATE TRIGGER `trg_proyecto_before_update` -- Tigger que se ejecuten antes de actualizar un proyecto
+  BEFORE UPDATE ON `proyecto` FOR EACH ROW BEGIN
+  INSERT INTO copia_actualizados_tablaUU(tabla, pk_valor, antes, despues)-- Insertar los valores anteriores  y los nuemeros nuevos del proyecto en la tabla auditoria
   VALUES(
     'proyecto',
     CAST(OLD.proyecto_id AS CHAR),
@@ -345,6 +370,7 @@ CREATE TRIGGER `trg_proyecto_before_update` BEFORE UPDATE ON `proyecto` FOR EACH
       'docente_id_jefe', NEW.docente_id_jefe
     )
   );
+
 END
 $$
 DELIMITER ;
