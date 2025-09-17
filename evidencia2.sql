@@ -23,7 +23,7 @@ SET time_zone = "+00:00";
 
 DELIMITER $$
 --
--- Procedimientos para crear un docente nuevo
+-- Procedimientos para crear un docente nuevo en la tabla
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_docente_create` (IN `p_numero_documento` VARCHAR(20),-- Documento del docente 
   IN `p_nombres` VARCHAR(120),-- Nombre completo del docente
@@ -447,3 +447,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
